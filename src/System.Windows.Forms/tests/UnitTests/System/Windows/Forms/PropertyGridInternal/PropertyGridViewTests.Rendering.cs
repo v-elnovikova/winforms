@@ -35,6 +35,7 @@ namespace System.Windows.Forms.Tests
 
             propertyGridView.PrintToMetafile(emf);
 
+            string s = emf.RecordsToString();
             // Only care about text: labels and values
             emf.Validate(
                 state,

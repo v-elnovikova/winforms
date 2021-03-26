@@ -1913,6 +1913,7 @@ namespace System.Windows.Forms
             // Avoid the listbox and textbox behaviour in Collection editors
             //
             UpdateFontCache();
+            InvalidateControlNativePortions();
         }
 
         /// <summary>

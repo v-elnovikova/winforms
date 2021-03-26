@@ -4232,6 +4232,50 @@ namespace System.Windows.Forms
             }
         }
 
+        private void ScaleForm(int deviceDpiNew, int deviceDpiOld, Rectangle? suggestedRectangle = default)
+        {
+            CommonProperties.xClearAllPreferredSizeCaches(this);
+            float factor = ((float)deviceDpiNew) / deviceDpiOld;
+
+            SuspendAllLayout(this);
+            try
+            {
+              /*  // In case if Form received WM_DPICHANGED message.
+                if (suggestedRectangle.HasValue)
+                {
+                    User32.SetWindowPos(
+                    new HandleRef(this, HandleInternal),
+                    User32.HWND_TOP,
+                    suggestedRectangle.Value.X,
+                    suggestedRectangle.Value.Y,
+                    suggestedRectangle.Value.Width,
+                    suggestedRectangle.Value.Height,
+                    User32.SWP.NOZORDER | User32.SWP.NOACTIVATE);
+                }*/
+
+                if (AutoScaleMode != AutoScaleMode.Font || Properties.ContainsObject(s_fontProperty))
+                {
+                    Font = new Font(Font.FontFamily, Font.Size * factor, Font.Style);
+                }
+                else
+                {
+                    ScaleFont(factor);
+                    using (new LayoutTransaction(ParentInternal, this, PropertyNames.Font))
+                    {
+                        OnFontChanged(EventArgs.Empty);
+                    }
+                }
+
+                //FormDpiChanged(factor, !suggestedRectangle.HasValue);
+            }
+            finally
+            {
+                // We want to perform layout for dpi-changed HDpi improvements - setting the second parameter to 'true'
+                ResumeAllLayout(this, true);
+                Refresh();
+            }
+        }
+
         /// <summary>
         ///  Raises the DpiChanged event.
         /// </summary>
@@ -4242,41 +4286,27 @@ namespace System.Windows.Forms
         {
             if (e.DeviceDpiNew != e.DeviceDpiOld)
             {
-                CommonProperties.xClearAllPreferredSizeCaches(this);
-
                 // call any additional handlers
                 ((DpiChangedEventHandler)Events[EVENT_DPI_CHANGED])?.Invoke(this, e);
 
                 if (!e.Cancel)
                 {
-                    float factor = (float)e.DeviceDpiNew / (float)e.DeviceDpiOld;
-                    SuspendAllLayout(this);
-                    try
-                    {
-                        User32.SetWindowPos(
-                            new HandleRef(this, HandleInternal),
-                            User32.HWND_TOP,
-                            e.SuggestedRectangle.X,
-                            e.SuggestedRectangle.Y,
-                            e.SuggestedRectangle.Width,
-                            e.SuggestedRectangle.Height,
-                            User32.SWP.NOZORDER | User32.SWP.NOACTIVATE);
-                        if (AutoScaleMode != AutoScaleMode.Font)
-                        {
-                            Font = new Font(Font.FontFamily, Font.Size * factor, Font.Style);
-                            FormDpiChanged(factor);
-                        }
-                        else
-                        {
-                            ScaleFont(factor);
-                            FormDpiChanged(factor);
-                        }
-                    }
-                    finally
-                    {
-                        // We want to perform layout for dpi-changed HDpi improvements - setting the second parameter to 'true'
-                        ResumeAllLayout(this, true);
-                    }
+                    ScaleForm(e.DeviceDpiNew, e.DeviceDpiOld, e.SuggestedRectangle);
+                }
+            }
+        }
+
+        protected override void RescaleConstantsForDpi(int deviceDpiOld, int deviceDpiNew)
+        {
+            if (deviceDpiNew != deviceDpiOld)
+            {
+                base.RescaleConstantsForDpi(deviceDpiOld, deviceDpiNew);
+
+                // Checking if font was inherited from parent. Font inherited from parent will receive OnParentFontChanged() events to scale those controls.
+                Font local = (Font)Properties.GetObject(s_fontProperty);
+                if (local is null)
+                {
+                    ScaleForm(deviceDpiNew, deviceDpiOld);
                 }
             }
         }

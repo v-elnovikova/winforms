@@ -1604,6 +1604,7 @@ namespace System.Windows.Forms
             base.OnFontChanged(e);
             _cachedDisplayRect = Rectangle.Empty;
             UpdateSize();
+            InvalidateControlNativePortions();
         }
 
         internal override void RecreateHandleCore()

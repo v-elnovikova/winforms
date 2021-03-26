@@ -1,3 +1,6 @@
+override System.Windows.Forms.Form.RescaleConstantsForDpi(int deviceDpiOld, int deviceDpiNew) -> void
+override System.Windows.Forms.ListView.InvalidateControlNativePortions(System.IntPtr nativeHwnd = default(System.IntPtr)) -> void
+virtual System.Windows.Forms.Control.InvalidateControlNativePortions(System.IntPtr nativeHandle = default(System.IntPtr)) -> void
 ~override System.Windows.Forms.ComboBox.OnMouseDown(System.Windows.Forms.MouseEventArgs e) -> void
 ~override System.Windows.Forms.ComboBox.OnKeyUp(System.Windows.Forms.KeyEventArgs e) -> void
 ~override System.Windows.Forms.ListView.OnLostFocus(System.EventArgs e) -> void

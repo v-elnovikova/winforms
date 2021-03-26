@@ -246,7 +246,7 @@ namespace System.Windows.Forms
         private static readonly int s_controlsCollectionProperty = PropertyStore.CreateKey();
         private static readonly int s_backColorProperty = PropertyStore.CreateKey();
         private static readonly int s_foreColorProperty = PropertyStore.CreateKey();
-        private static readonly int s_fontProperty = PropertyStore.CreateKey();
+        internal static readonly int s_fontProperty = PropertyStore.CreateKey();
 
         private static readonly int s_backgroundImageProperty = PropertyStore.CreateKey();
         private static readonly int s_fontHandleWrapperProperty = PropertyStore.CreateKey();
@@ -326,6 +326,7 @@ namespace System.Windows.Forms
         private LayoutEventArgs _cachedLayoutEventArgs;
         private Queue _threadCallbackList;
         internal int _deviceDpi;
+        internal Font ScaledControlFont;
 
         // For keeping track of our ui state for focus and keyboard cues. Using a member
         // variable here because we hit this a lot
@@ -2091,6 +2092,11 @@ namespace System.Windows.Forms
                     return f;
                 }
 
+                if (ScaledControlFont is not null)
+                {
+                    return ScaledControlFont;
+                }
+
                 if (IsActiveX)
                 {
                     f = ActiveXAmbientFont;
@@ -2177,19 +2183,26 @@ namespace System.Windows.Forms
         {
             Font local = (Font)Properties.GetObject(s_fontProperty);
             Font resolved = Font;
-            Font newFont = new Font(Font.FontFamily, Font.Size * factor, Font.Style);
+            ScaledControlFont = new Font(Font.FontFamily, Font.Size * factor, Font.Style, Font.Unit, Font.GdiCharSet, Font.GdiVerticalFont);
 
-            if ((local is null) || !local.Equals(newFont))
+            if ((local is null) || !local.Equals(ScaledControlFont))
             {
-                Properties.SetObject(s_fontProperty, newFont);
-
-                if (!resolved.Equals(newFont))
+                if (!resolved.Equals(ScaledControlFont))
                 {
                     DisposeFontHandle();
 
                     if (Properties.ContainsInteger(s_fontHeightProperty))
                     {
-                        Properties.SetInteger(s_fontHeightProperty, newFont.Height);
+                        Properties.SetInteger(s_fontHeightProperty, ScaledControlFont.Height);
+                    }
+
+                    if (local is not null)
+                    {
+                        Properties.SetObject(s_fontProperty, ScaledControlFont);
+                    }
+                    else
+                    {
+                        SetWindowFont(ScaledControlFont.ToHfont());
                     }
                 }
             }
@@ -2225,6 +2238,13 @@ namespace System.Windows.Forms
                 if (_parent is not null)
                 {
                     return _parent.FontHandle;
+                }
+
+                if (ScaledControlFont is not null)
+                {
+                    var fontHandleWrapper = new FontHandleWrapper(ScaledControlFont);
+
+                    return fontHandleWrapper.Handle;
                 }
 
                 AmbientProperties ambient = AmbientPropertiesService;
@@ -2291,7 +2311,9 @@ namespace System.Windows.Forms
                 if (localFontHeight == -1)
                 {
                     localFontHeight = Font.Height;
-                    Properties.SetInteger(s_fontHeightProperty, localFontHeight);
+
+                    //Should we set this property?
+                    //Properties.SetInteger(s_fontHeightProperty, localFontHeight);
                 }
 
                 return localFontHeight;
@@ -7247,6 +7269,22 @@ namespace System.Windows.Forms
         {
         }
 
+        // In some scenarios, Native portions (native controls embedded into control, ex: Column header in list view or Tabs in tabpage etc,)
+        // are not invalidated on Font changes and require special explicit invalidation adn this could be specific to  Native control embedded.
+        // It seems there is a bug either in WM_SETFONT message or Font.Equals() that are contradicting.
+        protected virtual unsafe void InvalidateControlNativePortions(IntPtr nativeHandle = default)
+        {
+            if (IsHandleCreated)
+            {
+                var handle = nativeHandle == default ? Handle : nativeHandle;
+                using (FontScopeHelper.EnterControlFontScope(this))
+                {
+                    User32.SendMessageW(handle, User32.WM.SETFONT, (IntPtr)FontHandle, PARAM.FromBool(false));
+                    User32.InvalidateRect(handle, null, BOOL.TRUE);
+                }
+            }
+        }
+
         [EditorBrowsable(EditorBrowsableState.Advanced)]
         protected virtual void OnFontChanged(EventArgs e)
         {
@@ -10110,14 +10148,14 @@ namespace System.Windows.Forms
         ///  The requestingControl property indicates which control has requested
         ///  the scaling function.
         /// </summary>
-        internal virtual void Scale(SizeF includedFactor, SizeF excludedFactor, Control requestingControl)
+        internal virtual void Scale(SizeF includedFactor, SizeF excludedFactor, Control requestingControl, bool updateWindowFontIfNeeded = false)
         {
             // When we scale, we are establishing new baselines for the
             // positions of all controls.  Therefore, we should resume(false).
             using (new LayoutTransaction(this, this, PropertyNames.Bounds, false))
             {
                 ScaleControl(includedFactor, excludedFactor, requestingControl);
-                ScaleChildControls(includedFactor, excludedFactor, requestingControl);
+                ScaleChildControls(includedFactor, excludedFactor, requestingControl, updateWindowFontIfNeeded);
             }
 
             LayoutTransaction.DoLayout(this, this, PropertyNames.Bounds);
@@ -10165,7 +10203,7 @@ namespace System.Windows.Forms
                             c.UpdateWindowFontIfNeeded();
                         }
 
-                        c.Scale(includedFactor, excludedFactor, requestingControl);
+                        c.Scale(includedFactor, excludedFactor, requestingControl, updateWindowFontIfNeeded);
                     }
                 }
             }
@@ -11201,9 +11239,10 @@ namespace System.Windows.Forms
             return align;
         }
 
-        private void SetWindowFont()
+        private void SetWindowFont(IntPtr? hFont = null)
         {
-            User32.SendMessageW(this, User32.WM.SETFONT, (IntPtr)FontHandle, PARAM.FromBool(false));
+            var fontHandle = hFont ?? (IntPtr)FontHandle;
+            User32.SendMessageW(this, User32.WM.SETFONT, fontHandle, PARAM.FromBool(false));
         }
 
         private void SetWindowStyle(int flag, bool value)
@@ -12146,7 +12185,7 @@ namespace System.Windows.Forms
         }
 
         /// <summary>
-        ///  Handles the WM_DPICHANGED_AFTERPARENT message
+        /// Handles the WM_DPICHANGED_AFTERPARENT message
         /// </summary>
         private void WmDpiChangedAfterParent(ref Message m)
         {

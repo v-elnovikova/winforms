@@ -3846,15 +3846,17 @@ namespace System.Windows.Forms
             }
         }
 
-        private unsafe void InvalidateColumnHeaders()
+        protected override unsafe void InvalidateControlNativePortions(IntPtr nativeHwnd = default)
         {
             if (viewStyle == View.Details && IsHandleCreated)
             {
-                IntPtr hwndHdr = User32.SendMessageW(this, (User32.WM)LVM.GETHEADER);
-                if (hwndHdr != IntPtr.Zero)
+                nativeHwnd = User32.SendMessageW(this, (User32.WM)LVM.GETHEADER);
+                if (nativeHwnd == IntPtr.Zero)
                 {
-                    User32.InvalidateRect(new HandleRef(this, hwndHdr), null, BOOL.TRUE);
+                    return;
                 }
+
+                base.InvalidateControlNativePortions(nativeHwnd);
             }
         }
 
@@ -4555,16 +4557,13 @@ namespace System.Windows.Forms
                 try
                 {
                     User32.SendMessageW(this, (User32.WM)LVM.UPDATE, (IntPtr)(-1));
+                    InvalidateControlNativePortions();
                 }
                 finally
                 {
                     EndUpdate();
                 }
             }
-
-            // If font changes and we have headers, they need to be expicitly invalidated
-            //
-            InvalidateColumnHeaders();
         }
 
         protected override void OnHandleCreated(EventArgs e)
@@ -5261,7 +5260,7 @@ namespace System.Windows.Forms
 
             // When running on AMD64 the list view does not invalidate the column header.
             // So we do it ourselves.
-            InvalidateColumnHeaders();
+            InvalidateControlNativePortions();
         }
 
         /// <summary>

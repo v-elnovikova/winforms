@@ -813,7 +813,7 @@ namespace System.Windows.Forms
                 _state[s_stateScalingChild] = true;
                 try
                 {
-                    child.Scale(AutoScaleFactor, SizeF.Empty, this);
+                    child.Scale(AutoScaleFactor, SizeF.Empty, this, true);
                 }
                 finally
                 {
@@ -870,13 +870,20 @@ namespace System.Windows.Forms
         /// <summary>
         ///  This is called by the top level form to clear the current autoscale cache.
         /// </summary>
-        private protected void FormDpiChanged(float factor)
+        private protected void FormDpiChanged(float factor, bool adjustContainerBounds)
         {
             Debug.Assert(this is Form);
 
             _currentAutoScaleDimensions = SizeF.Empty;
 
             SuspendAllLayout(this);
+            if(adjustContainerBounds)
+            {
+                // in case Form receive WM_DPICHANGED_BEFOREPARENT message.
+                Width = (int)(Width * factor);
+                Height = (int)(Height * factor);
+            }
+
             SizeF factorSize = new SizeF(factor, factor);
             try
             {
@@ -959,7 +966,7 @@ namespace System.Windows.Forms
                     // we set its scaling factor to unity too.
                     SizeF included = includedBounds ? AutoScaleFactor : SizeF.Empty;
                     SizeF excluded = excludedBounds ? AutoScaleFactor : SizeF.Empty;
-                    Scale(included, excluded, this);
+                    Scale(included, excluded, this, true);
                     _autoScaleDimensions = CurrentAutoScaleDimensions;
                 }
             }
@@ -1033,13 +1040,13 @@ namespace System.Windows.Forms
         ///  control's AutoScaleFactor. Any changed controls are scaled according to the provided
         ///  scaling factor.
         /// </summary>
-        internal override void Scale(SizeF includedFactor, SizeF excludedFactor, Control requestingControl)
+        internal override void Scale(SizeF includedFactor, SizeF excludedFactor, Control requestingControl, bool updateWindowFontIfNeeded = false)
         {
             // If we're inhieriting our scaling from our parent, Scale is really easy:  just do the
             // base class implementation.
             if (AutoScaleMode == AutoScaleMode.Inherit)
             {
-                base.Scale(includedFactor, excludedFactor, requestingControl);
+                base.Scale(includedFactor, excludedFactor, requestingControl, true);
             }
             else
             {
@@ -1096,7 +1103,7 @@ namespace System.Windows.Forms
                     }
 
                     ScaleControl(includedFactor, ourExternalContainerFactor, requestingControl);
-                    ScaleChildControls(childIncludedFactor, ourExcludedFactor, requestingControl);
+                    ScaleChildControls(childIncludedFactor, ourExcludedFactor, requestingControl, updateWindowFontIfNeeded);
                 }
             }
         }
