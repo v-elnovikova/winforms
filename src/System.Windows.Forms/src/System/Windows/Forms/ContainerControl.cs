@@ -157,7 +157,7 @@ namespace System.Windows.Forms
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public AutoScaleMode AutoScaleMode
         {
-            get => _autoScaleMode;
+            get => _autoScaleMode;// == AutoScaleMode.Inherit ? GetParentAutoScaleMode() : _autoScaleMode;
             set
             {
                 SourceGenerated.EnumValidator.Validate(value);
@@ -184,6 +184,19 @@ namespace System.Windows.Forms
                     LayoutScalingNeeded();
                 }
             }
+        }
+
+        private AutoScaleMode GetParentAutoScaleMode()
+        {
+            if (ParentInternal is ContainerControl parentContainer)
+            {
+                if(parentContainer.AutoScaleMode != AutoScaleMode.Inherit)
+                {
+                    return parentContainer.AutoScaleMode;
+                }
+            }
+
+            return AutoScaleMode.None;
         }
 
         /// <summary>
@@ -306,7 +319,8 @@ namespace System.Windows.Forms
             {
                 if (_currentAutoScaleDimensions.IsEmpty)
                 {
-                    switch (AutoScaleMode)
+                    var autoScaleMode = this is Form ? AutoScaleMode.Dpi : AutoScaleMode;
+                    switch (autoScaleMode)
                     {
                         case AutoScaleMode.Font:
                             _currentAutoScaleDimensions = GetFontAutoScaleDimensions();
@@ -843,7 +857,7 @@ namespace System.Windows.Forms
         [EditorBrowsable(EditorBrowsableState.Advanced)]
         protected override void OnFontChanged(EventArgs e)
         {
-            if (AutoScaleMode == AutoScaleMode.Font)
+            if (AutoScaleMode != AutoScaleMode.None)
             {
                 _currentAutoScaleDimensions = SizeF.Empty;
 

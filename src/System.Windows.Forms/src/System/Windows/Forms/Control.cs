@@ -326,6 +326,7 @@ namespace System.Windows.Forms
         private LayoutEventArgs _cachedLayoutEventArgs;
         private Queue _threadCallbackList;
         internal int _deviceDpi;
+        private int _deviceDpiOld;
         internal Font ScaledControlFont;
 
         // For keeping track of our ui state for focus and keyboard cues. Using a member
@@ -374,7 +375,7 @@ namespace System.Windows.Forms
             Properties = new PropertyStore();
 
             // Initialize DPI to the value on the primary screen, we will have the correct value when the Handle is created.
-            _deviceDpi = DpiHelper.DeviceDpi;
+            _deviceDpi = _deviceDpiOld = DpiHelper.DeviceDpi;
 
             _window = new ControlNativeWindow(this);
             RequiredScalingEnabled = true;
@@ -2080,6 +2081,11 @@ namespace System.Windows.Forms
             [return: MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(ActiveXFontMarshaler))]
             get
             {
+                if (ScaledControlFont is not null)
+                {
+                    return ScaledControlFont;
+                }
+
                 Font font = (Font)Properties.GetObject(s_fontProperty);
                 if (font is not null)
                 {
@@ -2090,11 +2096,6 @@ namespace System.Windows.Forms
                 if (f is not null)
                 {
                     return f;
-                }
-
-                if (ScaledControlFont is not null)
-                {
-                    return ScaledControlFont;
                 }
 
                 if (IsActiveX)
@@ -2220,6 +2221,13 @@ namespace System.Windows.Forms
         {
             get
             {
+                if (ScaledControlFont is not null)
+                {
+                    var fontHandleWrapper = new FontHandleWrapper(ScaledControlFont);
+
+                    return fontHandleWrapper.Handle;
+                }
+
                 Font font = (Font)Properties.GetObject(s_fontProperty);
 
                 if (font is not null)
@@ -2238,13 +2246,6 @@ namespace System.Windows.Forms
                 if (_parent is not null)
                 {
                     return _parent.FontHandle;
-                }
-
-                if (ScaledControlFont is not null)
-                {
-                    var fontHandleWrapper = new FontHandleWrapper(ScaledControlFont);
-
-                    return fontHandleWrapper.Handle;
                 }
 
                 AmbientProperties ambient = AmbientPropertiesService;
@@ -6854,7 +6855,7 @@ namespace System.Windows.Forms
         {
             if (DpiHelper.IsPerMonitorV2Awareness)
             {
-                User32.AdjustWindowRectExForDpi(ref rect, style, bMenu.ToBOOL(), exStyle, (uint)_deviceDpi);
+                User32.AdjustWindowRectExForDpi(ref rect, style, bMenu.ToBOOL(), exStyle, (uint)_deviceDpiOld);
             }
             else
             {
@@ -12162,22 +12163,22 @@ namespace System.Windows.Forms
 
             if (IsHandleCreated)
             {
-                int deviceDpiOld = _deviceDpi;
+                _deviceDpiOld = _deviceDpi;
                 _deviceDpi = (int)User32.GetDpiForWindow(this);
 
                 // Controls are by default font scaled.
                 // Dpi change requires font to be recalculated inorder to get controls scaled with right dpi.
-                if (deviceDpiOld != _deviceDpi)
+                if (_deviceDpiOld != _deviceDpi)
                 {
                     // Checking if font was inherited from parent. Font inherited from parent will receive OnParentFontChanged() events to scale those controls.
                     Font local = (Font)Properties.GetObject(s_fontProperty);
                     if (local is not null)
                     {
-                        var factor = (float)_deviceDpi / deviceDpiOld;
+                        var factor = (float)_deviceDpi / _deviceDpiOld;
                         Font = new Font(local.FontFamily, local.Size * factor, local.Style, local.Unit, local.GdiCharSet, local.GdiVerticalFont);
                     }
 
-                    RescaleConstantsForDpi(deviceDpiOld, _deviceDpi);
+                    RescaleConstantsForDpi(_deviceDpiOld, _deviceDpi);
                 }
             }
 

@@ -2800,6 +2800,7 @@ namespace System.Windows.Forms
         [Obsolete("This method has been deprecated. Use the ApplyAutoScaling method instead.  https://go.microsoft.com/fwlink/?linkid=14202")]
         protected void ApplyAutoScaling()
         {
+            /*
             Debug.WriteLineIf(CompModSwitches.RichLayout.TraceInfo, "ApplyAutoScaling... ");
             Debug.Indent();
             // NOTE : This function is cloned in FormDocumentDesigner... remember to keep
@@ -2836,7 +2837,7 @@ namespace System.Windows.Forms
                 AutoScaleBaseSize = newVar;
             }
 
-            Debug.Unindent();
+            Debug.Unindent();*/
         }
 
         /// <summary>
@@ -4240,20 +4241,7 @@ namespace System.Windows.Forms
             SuspendAllLayout(this);
             try
             {
-              /*  // In case if Form received WM_DPICHANGED message.
-                if (suggestedRectangle.HasValue)
-                {
-                    User32.SetWindowPos(
-                    new HandleRef(this, HandleInternal),
-                    User32.HWND_TOP,
-                    suggestedRectangle.Value.X,
-                    suggestedRectangle.Value.Y,
-                    suggestedRectangle.Value.Width,
-                    suggestedRectangle.Value.Height,
-                    User32.SWP.NOZORDER | User32.SWP.NOACTIVATE);
-                }*/
-
-                if (AutoScaleMode != AutoScaleMode.Font || Properties.ContainsObject(s_fontProperty))
+                if (Properties.ContainsObject(s_fontProperty))
                 {
                     Font = new Font(Font.FontFamily, Font.Size * factor, Font.Style);
                 }
@@ -4266,13 +4254,25 @@ namespace System.Windows.Forms
                     }
                 }
 
+                // In case if Form received WM_DPICHANGED message.
+                if (suggestedRectangle.HasValue)
+                {
+                    User32.SetWindowPos(
+                    new HandleRef(this, HandleInternal),
+                    User32.HWND_TOP,
+                    suggestedRectangle.Value.X,
+                    suggestedRectangle.Value.Y,
+                    suggestedRectangle.Value.Width,
+                    suggestedRectangle.Value.Height,
+                    User32.SWP.NOZORDER | User32.SWP.NOACTIVATE);
+                }
+
                 //FormDpiChanged(factor, !suggestedRectangle.HasValue);
             }
             finally
             {
                 // We want to perform layout for dpi-changed HDpi improvements - setting the second parameter to 'true'
                 ResumeAllLayout(this, true);
-                Refresh();
             }
         }
 
