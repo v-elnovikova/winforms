@@ -135,17 +135,6 @@ namespace System.Windows.Forms
         }
 
         /// <summary>
-        ///  Set the default Padding to 3 so that it is consistent with Everett
-        /// </summary>
-        protected override Padding DefaultPadding => new Padding(3);
-
-        /// <summary>
-        ///  Deriving classes can override this to configure a default size for their control.
-        ///  This is more efficient than setting the size in the control's constructor.
-        /// </summary>
-        protected override Size DefaultSize => new Size(200, 100);
-
-        /// <summary>
         ///  Gets a rectangle that represents the dimensions of the <see cref='GroupBox'/>
         /// </summary>
         public override Rectangle DisplayRectangle

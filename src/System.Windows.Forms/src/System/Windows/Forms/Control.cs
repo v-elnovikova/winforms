@@ -1824,21 +1824,25 @@ namespace System.Windows.Forms
         /// </summary>
         public static Color DefaultForeColor => SystemColors.ControlText;
 
-        protected virtual Padding DefaultMargin => CommonProperties.DefaultMargin;
+        protected virtual Padding DefaultMargin
+            => Application.Defaults.GetValueOrDefault<Padding>(GetType(), typeof(Control));
 
         protected virtual Size DefaultMaximumSize => CommonProperties.DefaultMaximumSize;
 
         protected virtual Size DefaultMinimumSize => CommonProperties.DefaultMinimumSize;
 
-        protected virtual Padding DefaultPadding => Padding.Empty;
+        protected virtual Padding DefaultPadding
+            => Application.Defaults.GetValueOrDefault<Padding>(GetType(), typeof(Control));
 
-        private RightToLeft DefaultRightToLeft => RightToLeft.No;
+        private RightToLeft DefaultRightToLeft
+            => Application.Defaults.GetValueOrDefault<RightToLeft>(GetType(), typeof(Control));
 
         /// <summary>
         ///  Deriving classes can override this to configure a default size for their control.
         ///  This is more efficient than setting the size in the control's constructor.
         /// </summary>
-        protected virtual Size DefaultSize => Size.Empty;
+        protected virtual Size DefaultSize
+            => Application.Defaults.GetValueOrDefault<Size>(GetType(), typeof(Control));
 
         private void DetachContextMenuStrip(object sender, EventArgs e) => ContextMenuStrip = null;
 

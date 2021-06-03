@@ -4,3 +4,8 @@ System.Windows.Forms.ApplicationDefaultsExtension
 ~System.Windows.Forms.Application.ApplicationDefaults.TryAddDefaultValue<T>(string PropertyName, object value) -> bool
 ~static System.Windows.Forms.Application.Defaults.get -> System.Windows.Forms.Application.ApplicationDefaults
 ~static System.Windows.Forms.ApplicationDefaultsExtension.SetFont(this System.Windows.Forms.Application.ApplicationDefaults defaults, System.Drawing.Font font) -> System.Windows.Forms.Application.ApplicationDefaults
+~static System.Windows.Forms.ApplicationDefaultsExtension.SetFormShowInTaskbar(this System.Windows.Forms.Application.ApplicationDefaults defaults, bool showInTaskbar) -> System.Windows.Forms.Application.ApplicationDefaults
+~static System.Windows.Forms.ApplicationDefaultsExtension.SetFormStartPosition(this System.Windows.Forms.Application.ApplicationDefaults defaults, System.Windows.Forms.FormStartPosition startPosition) -> System.Windows.Forms.Application.ApplicationDefaults
+~static System.Windows.Forms.ApplicationDefaultsExtension.SetMargin<ControlType>(this System.Windows.Forms.Application.ApplicationDefaults defaults, System.Windows.Forms.Padding margin) -> System.Windows.Forms.Application.ApplicationDefaults
+~static System.Windows.Forms.ApplicationDefaultsExtension.SetPadding<ControlType>(this System.Windows.Forms.Application.ApplicationDefaults defaults, System.Windows.Forms.Padding padding) -> System.Windows.Forms.Application.ApplicationDefaults
+~static System.Windows.Forms.ApplicationDefaultsExtension.SetRightToLeft<ControlType>(this System.Windows.Forms.Application.ApplicationDefaults defaults, System.Windows.Forms.RightToLeft rightToLeft) -> System.Windows.Forms.Application.ApplicationDefaults

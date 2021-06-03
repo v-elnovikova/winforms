@@ -162,17 +162,36 @@ namespace System.Windows.Forms
         /// </summary>
         public Form() : base()
         {
+            var defaultStartPos=(int) Application.
+                Defaults.
+                GetValueOrDefault<FormStartPosition>(
+                    GetType(),
+                    null,
+                    Application.ApplicationDefaults.DefaultStartPosition);
+
+            var defaultShowInTaskbar = Application.
+                Defaults.
+                GetValueOrDefault<bool>(
+                    GetType(),
+                    null,
+                    Application.ApplicationDefaults.DefaultShowInTaskbar)
+                ? 1
+                : 0;
+
+            formState[FormStateStartPos] = defaultStartPos;
+            formState[FormStateTaskBar] = defaultShowInTaskbar;
+
             // Assert section.
             Debug.Assert(formState[FormStateAllowTransparency] == 0, "Failed to set formState[FormStateAllowTransparency]");
             Debug.Assert(formState[FormStateBorderStyle] == (int)FormBorderStyle.Sizable, "Failed to set formState[FormStateBorderStyle]");
-            Debug.Assert(formState[FormStateTaskBar] == 1, "Failed to set formState[FormStateTaskBar]");
+            Debug.Assert(formState[FormStateTaskBar] == defaultShowInTaskbar, "Failed to set formState[FormStateTaskBar]");
             Debug.Assert(formState[FormStateControlBox] == 1, "Failed to set formState[FormStateControlBox]");
             Debug.Assert(formState[FormStateKeyPreview] == 0, "Failed to set formState[FormStateKeyPreview]");
             Debug.Assert(formState[FormStateLayered] == 0, "Failed to set formState[FormStateLayered]");
             Debug.Assert(formState[FormStateMaximizeBox] == 1, "Failed to set formState[FormStateMaximizeBox]");
             Debug.Assert(formState[FormStateMinimizeBox] == 1, "Failed to set formState[FormStateMinimizeBox]");
             Debug.Assert(formState[FormStateHelpButton] == 0, "Failed to set formState[FormStateHelpButton]");
-            Debug.Assert(formState[FormStateStartPos] == (int)FormStartPosition.WindowsDefaultLocation, "Failed to set formState[FormStateStartPos]");
+            Debug.Assert(formState[FormStateStartPos] == defaultStartPos, "Failed to set formState[FormStateStartPos]");
             Debug.Assert(formState[FormStateWindowState] == (int)FormWindowState.Normal, "Failed to set formState[FormStateWindowState]");
             Debug.Assert(formState[FormStateShowWindowOnCreate] == 0, "Failed to set formState[FormStateShowWindowOnCreate]");
             Debug.Assert(formState[FormStateAutoScaling] == 1, "Failed to set formState[FormStateAutoScaling]");
@@ -1899,7 +1918,6 @@ namespace System.Windows.Forms
         /// <summary>
         ///  If ShowInTaskbar is true then the form will be displayed in the Windows Taskbar.
         /// </summary>
-        [DefaultValue(true)]
         [SRCategory(nameof(SR.CatWindowStyle))]
         [SRDescription(nameof(SR.FormShowInTaskbarDescr))]
         public bool ShowInTaskbar
@@ -1917,6 +1935,22 @@ namespace System.Windows.Forms
                 }
             }
         }
+
+        private bool ShouldSerializeShowInTaskbar()
+            => ShowInTaskbar == Application.
+                Defaults.
+                GetValueOrDefault<bool>(
+                    GetType(),
+                    null,
+                    nameof(ShowInTaskbar));
+
+        private void ResetShowInTaskBar()
+            => ShowInTaskbar = Application.
+                Defaults.
+                GetValueOrDefault<bool>(
+                    GetType(),
+                    null,
+                    nameof(ShowInTaskbar));
 
         /// <summary>
         ///  Gets or sets a value indicating whether an icon is displayed in the
@@ -2028,7 +2062,6 @@ namespace System.Windows.Forms
         /// </summary>
         [Localizable(true)]
         [SRCategory(nameof(SR.CatLayout))]
-        [DefaultValue(FormStartPosition.WindowsDefaultLocation)]
         [SRDescription(nameof(SR.FormStartPositionDescr))]
         public FormStartPosition StartPosition
         {
@@ -2043,6 +2076,23 @@ namespace System.Windows.Forms
                 formState[FormStateStartPos] = (int)value;
             }
         }
+
+        private bool ShouldSerializeStartPosition()
+            => StartPosition == Application.
+                Defaults.
+                GetValueOrDefault<FormStartPosition>(
+                    GetType(),
+                    null,
+                    Application.ApplicationDefaults.DefaultStartPosition);
+
+        private void ResetStartPosition()
+            => StartPosition = Application.
+                Defaults.
+                GetValueOrDefault<FormStartPosition>(
+                    GetType(),
+                    null,
+                    Application.ApplicationDefaults.DefaultStartPosition);
+
 
         [Browsable(false)]
         [EditorBrowsable(EditorBrowsableState.Never)]

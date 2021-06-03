@@ -6,6 +6,9 @@
 
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Drawing;
+using System.Runtime.CompilerServices;
+using System.Windows.Forms.Layout;
 
 namespace System.Windows.Forms
 {
@@ -13,9 +16,29 @@ namespace System.Windows.Forms
     {
         public class ApplicationDefaults
         {
+            internal const string DefaultPadding = nameof(DefaultPadding);
+            internal const string DefaultMargin = nameof(DefaultMargin);
+            internal const string DefaultRightToLeft = nameof(DefaultRightToLeft);
+            internal const string DefaultSize = nameof(DefaultSize);
+
+            internal const string DefaultStartPosition = nameof(DefaultStartPosition);
+            internal const string DefaultShowInTaskbar = nameof(DefaultShowInTaskbar);
+
             internal ApplicationDefaults()
             {
                 DefaultProperties = new Dictionary<(Type, string), object>();
+
+                // Setting up the Default-Defaults.
+                TryAddDefaultValue<Control>(DefaultPadding, Padding.Empty);
+                TryAddDefaultValue<Control>(DefaultMargin, CommonProperties.DefaultMargin);
+                TryAddDefaultValue<Control>(DefaultRightToLeft, RightToLeft.No);
+                TryAddDefaultValue<Control>(DefaultSize, RightToLeft.No);
+
+                TryAddDefaultValue<GroupBox>(DefaultPadding, new Padding(3));
+                TryAddDefaultValue<GroupBox>(DefaultSize, new Size(200, 200));
+
+                TryAddDefaultValue<Form>(DefaultStartPosition, FormStartPosition.WindowsDefaultLocation);
+                TryAddDefaultValue<Form>(DefaultShowInTaskbar, true);
             }
 
             private Dictionary<(Type, string), object> DefaultProperties { get; }
@@ -49,9 +72,26 @@ namespace System.Windows.Forms
                 value = null;
                 return false;
             }
-
+            
             internal T GetValueOrDefault<T>(string propertyName)
                 => (T)DefaultProperties.GetValueOrDefault((typeof(Control), propertyName));
+
+            internal T GetValueOrDefault<T>(
+                Type controlType,
+                Type fallbackControlType,
+                [CallerMemberName] string propertyName = null)
+            {
+                if (DefaultProperties.TryGetValue((controlType, propertyName), out var value))
+                {
+                    return (T)value;
+                }
+                else
+                {
+                    return fallbackControlType is null
+                           ? default(T)
+                           : (T)DefaultProperties.GetValueOrDefault((fallbackControlType, propertyName));
+                }
+            }
 
             internal T GetValueOrDefault<ControlType, T>(string propertyName) where ControlType : Component
                 => (T)DefaultProperties.GetValueOrDefault((typeof(ControlType), propertyName));

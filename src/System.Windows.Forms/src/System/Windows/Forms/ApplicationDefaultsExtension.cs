@@ -5,6 +5,7 @@
 #nullable disable
 
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Drawing;
 using static System.Windows.Forms.Application;
 
@@ -121,6 +122,51 @@ namespace System.Windows.Forms
             }
 
             defaults.TryAddDefaultValue(DefaultFont, defaultFont);
+
+            return defaults;
+        }
+
+        public static ApplicationDefaults SetPadding<ControlType>(this ApplicationDefaults defaults, Padding padding) where ControlType : Component
+        {
+            defaults.TryAddDefaultValue<ControlType>(
+                Application.ApplicationDefaults.DefaultPadding,
+                padding);
+
+            return defaults;
+        }
+
+        public static ApplicationDefaults SetMargin<ControlType>(this ApplicationDefaults defaults, Padding margin) where ControlType : Component
+        {
+            defaults.TryAddDefaultValue<ControlType>(
+                Application.ApplicationDefaults.DefaultMargin,
+                margin);
+
+            return defaults;
+        }
+
+        public static ApplicationDefaults SetRightToLeft<ControlType>(this ApplicationDefaults defaults, RightToLeft rightToLeft) where ControlType : Component
+        {
+            defaults.TryAddDefaultValue<ControlType>(
+                Application.ApplicationDefaults.DefaultRightToLeft,
+                margin);
+
+            return defaults;
+        }
+
+        public static ApplicationDefaults SetFormStartPosition(this ApplicationDefaults defaults, FormStartPosition startPosition) 
+        {
+            defaults.TryAddDefaultValue<Form>(
+                Application.ApplicationDefaults.DefaultStartPosition,
+                startPosition);
+
+            return defaults;
+        }
+
+        public static ApplicationDefaults SetFormShowInTaskbar(this ApplicationDefaults defaults, bool showInTaskbar)
+        {
+            defaults.TryAddDefaultValue<Form>(
+                Application.ApplicationDefaults.DefaultShowInTaskbar,
+                showInTaskbar);
 
             return defaults;
         }
