@@ -409,16 +409,17 @@ Namespace Microsoft.VisualBasic.ApplicationServices
             Dim getHighDpiEventArgs = New ApplyHighDpiModeEventArgs(HighDpiMode)
             RaiseEvent ApplyHighDpiMode(Me, getHighDpiEventArgs)
 
-            ' ...and whatever Defaults need to be set.
-            Dim getApplicationDefaultsEventArgs = New ApplyDefaultsEventArgs(Windows.Forms.Application.Defaults)
-            RaiseEvent ApplyHighDpiMode(Me, getHighDpiEventArgs)
-
-            ' Apply HighDpiMode
+            ' ...apply HighDpiMode...
             Dim dpiSetResult = Windows.Forms.Application.SetHighDpiMode(_highDpiMode)
             If dpiSetResult Then
                 _highDpiMode = Windows.Forms.Application.HighDpiMode
             End If
-            Debug.Assert(dpiSetResult, "We could net set the HighDpiMode.")
+            Debug.Assert(dpiSetResult, "We could not set the HighDpiMode.")
+
+            ' ...and whatever Defaults need to be set.
+            ' (Since we pass a reference to the ApplicationDefaults, this doesn't need to get processed.)
+            Dim getApplicationDefaultsEventArgs = New ApplyDefaultsEventArgs(Windows.Forms.Application.Defaults)
+            RaiseEvent ApplyApplicationDefaults(Me, getApplicationDefaultsEventArgs)
 
             ' EnableVisualStyles
             If _enableVisualStyles Then

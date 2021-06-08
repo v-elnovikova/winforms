@@ -148,7 +148,7 @@ namespace System.Windows.Forms
         {
             defaults.TryAddDefaultValue<ControlType>(
                 Application.ApplicationDefaults.DefaultRightToLeft,
-                margin);
+                rightToLeft);
 
             return defaults;
         }

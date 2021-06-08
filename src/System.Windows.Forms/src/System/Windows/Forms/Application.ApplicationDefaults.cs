@@ -32,7 +32,7 @@ namespace System.Windows.Forms
                 TryAddDefaultValue<Control>(DefaultPadding, Padding.Empty);
                 TryAddDefaultValue<Control>(DefaultMargin, CommonProperties.DefaultMargin);
                 TryAddDefaultValue<Control>(DefaultRightToLeft, RightToLeft.No);
-                TryAddDefaultValue<Control>(DefaultSize, RightToLeft.No);
+                TryAddDefaultValue<Control>(DefaultSize, Size.Empty);
 
                 TryAddDefaultValue<GroupBox>(DefaultPadding, new Padding(3));
                 TryAddDefaultValue<GroupBox>(DefaultSize, new Size(200, 200));
@@ -72,7 +72,7 @@ namespace System.Windows.Forms
                 value = null;
                 return false;
             }
-            
+
             internal T GetValueOrDefault<T>(string propertyName)
                 => (T)DefaultProperties.GetValueOrDefault((typeof(Control), propertyName));
 
