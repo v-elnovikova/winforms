@@ -63,6 +63,7 @@ namespace System.Windows.Forms
         // Used to avoid recursive exit
         private static bool s_exiting;
 
+        public WinformsOptionalSettings Options { get; private set; }
         /// <summary>
         ///  This class is static, there is no need to ever create it.
         /// </summary>
@@ -1329,5 +1330,10 @@ namespace System.Windows.Forms
         /// </summary>
         public static void SetUnhandledExceptionMode(UnhandledExceptionMode mode, bool threadScope)
             => NativeWindow.SetUnhandledExceptionModeInternal(mode, threadScope);
+
+        public void SetWinformsOptions(WinformsOptionalSettings options)
+        {
+            Options = options;
+        }
     }
 }

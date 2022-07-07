@@ -1,1 +1,19 @@
 ~override System.Windows.Forms.WebBrowser.CreateAccessibilityInstance() -> System.Windows.Forms.AccessibleObject
+System.Windows.Forms.Application.SetWinformsOptions() -> void
+System.Windows.Forms.Application.Options.get -> System.Windows.Forms.Application.WinformsOptionalSettings
+System.Windows.Forms.Application.WinformsOptionalSettings
+System.Windows.Forms.Application.WinformsOptionalSettings.HighDpiSettings
+System.Windows.Forms.Application.WinformsOptionalSettings.ThemingSettings
+System.Windows.Forms.Application.WinformsOptionalSettings.AccessibilitySettings
+System.Windows.Forms.Application.WinformsOptionalSettings.HighDpiSettings.HighDpiImprovementsOne.get -> bool
+System.Windows.Forms.Application.WinformsOptionalSettings.HighDpiSettings.HighDpiImprovementsOne.set -> bool
+System.Windows.Forms.Application.WinformsOptionalSettings.HighDpiSettings.HighDpiImprovementsTwo.get -> bool
+System.Windows.Forms.Application.WinformsOptionalSettings.HighDpiSettings.HighDpiImprovementsTwo.set -> bool
+System.Windows.Forms.Application.WinformsOptionalSettings.AccessibilitySettings.AccessibilityImprovementsOne.get -> bool
+System.Windows.Forms.Application.WinformsOptionalSettings.AccessibilitySettings.AccessibilityImprovementsOne.set -> bool
+System.Windows.Forms.Application.WinformsOptionalSettings.AccessibilitySettings.AccessibilityImprovementsTwo.get -> bool
+System.Windows.Forms.Application.WinformsOptionalSettings.AccessibilitySettings.AccessibilityImprovementsTwo.set -> bool
+System.Windows.Forms.Application.WinformsOptionalSettings.ThemingSettings.ThemingImprovementsOne.get -> bool
+System.Windows.Forms.Application.WinformsOptionalSettings.ThemingSettings.ThemingImprovementsOne.set -> bool
+System.Windows.Forms.Application.WinformsOptionalSettings.ThemingSettings.ThemingImprovementsTwo.get -> bool
+System.Windows.Forms.Application.WinformsOptionalSettings.ThemingSettings.ThemingImprovementsTwo.set -> bool

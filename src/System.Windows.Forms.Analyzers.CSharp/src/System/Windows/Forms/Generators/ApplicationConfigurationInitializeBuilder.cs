@@ -37,6 +37,9 @@ namespace System.Windows.Forms.Generators
                     code.AppendLine($"{indent}Application.SetDefaultFont({defaultFont});");
                 }
 
+                code.AppendLine($"{indent}IConfiguration configuration = new ConfigurationBuilder().AddJsonFile(\"appsettings.json\", true).Build()");
+                code.AppendLine($"{indent}Application.SetWinformsOptions(configuration.GetSection(\"WinformsOptionalSettings\").Get<WinformsOptionalSettings>())");
+
                 // Don't append line as we don't need the trailing \r\n!
                 code.Remove(code.Length - Environment.NewLine.Length, Environment.NewLine.Length);
 
