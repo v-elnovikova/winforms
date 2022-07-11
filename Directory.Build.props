@@ -86,4 +86,9 @@
     <DisableImplicitNETCorePlatformsReference>true</DisableImplicitNETCorePlatformsReference>
   </PropertyGroup>
 
+  <PropertyGroup>
+    <WarningsAsErrors>$(WarningsAsErrors);SYSLIB0011</WarningsAsErrors>
+    <WarningsNotAsErrors>$(WarningsNotAsErrors);NU1605</WarningsNotAsErrors>
+  </PropertyGroup>
+
 </Project>
