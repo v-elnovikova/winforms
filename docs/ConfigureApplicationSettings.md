@@ -64,11 +64,11 @@ There are two approaches here.
 Read applications settings always form AppSettings.Json at runtime and
 populate all associated properties that are later used at various levels
 in the runtime. This approach would start throwing compile time error if
-proj file contains any winforms settings and project is being targeted
-with latest.
+build properties ( i.e properties in proj file etc) contains any winforms settings and project is being targeted
+with latest .NET SDK.
 
-Ex: Currently source generator emits the following API into source. We
-update this to the following.
+Ex: Currently source generator emits the `ApplicationConfiguartion.Initialize()` API into source code. We will
+modify this to the following.
 
 ```cs
  ApplicationConfiguartion.Initialize()
@@ -97,9 +97,9 @@ thereby avoid reading disk at runtime.
 
 Source generator, read settings from the AppSettings.Json file and emits
 code into source. Following is the snippet on how this looks. Analyzer
-would throw compile time warnings (not errors?) if proj file contained
-any winforms settings.
+would throw compile time warnings (not errors?) if any winforms settings is defined as build time property( ex: via Project file)
 
+In case any setting is defined both at build time and in ApSettings.Json file, setting from AppSettings.Json file will take precedence.
 ```cs
 ApplicationConfiguartion.Initialize()
  {
