@@ -1,3 +1,6 @@
+AdjustWindowRectEx
+AdjustWindowRectExForDpi
+BeginPaint
 BitBlt
 CloseEnhMetaFile
 CombineRgn
@@ -5,8 +8,10 @@ CreateBitmap
 CreateBrushIndirect
 CreateCompatibleBitmap
 DuplicateHandle
+EndPaint
 FormatMessage
 GET_MODULE_HANDLE_EX_FLAG*
+GetClientRect
 GetCurrentActCtx
 GetCurrentProcess
 GetCurrentProcessId
@@ -23,9 +28,4 @@ GlobalLock
 GlobalReAlloc
 GlobalSize
 GlobalUnlock
-GetProcAddress
-GetModuleHandleEx
-GET_MODULE_HANDLE_EX_FLAG*
-GetTickCount
-GlobalSize
-FormatMessage
+
