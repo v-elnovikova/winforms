@@ -81,10 +81,12 @@ modify this to the following.
    Application.ApplyWinformsApplicationSettings();
 }
  
-ApplicationConfiguartion.ReadApplicationSettings()
+bool ApplicationConfiguartion.ReadApplicationSettings()
 {
   IConfiguration configuration = new ConfigurationBuilder().AddJsonFile(\\\"appsettings.json\\\",true).Build()\");
   Application.SetWinformsSettings(configuration.GetSection(\\\"WinformsOptionalSettings\\\").Get\<WinformsOptionalSettings\>())\");
+  ....
+  return true;
 }
 ```
 
