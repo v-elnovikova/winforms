@@ -83,8 +83,8 @@ modify this to the following.
  
 bool ApplicationConfiguartion.ReadApplicationSettings()
 {
-  IConfiguration configuration = new ConfigurationBuilder().AddJsonFile(\\\"appsettings.json\\\",true).Build()\");
-  Application.SetWinformsSettings(configuration.GetSection(\\\"WinformsOptionalSettings\\\").Get\<WinformsOptionalSettings\>())\");
+  IConfiguration configuration = new ConfigurationBuilder().AddJsonFile("appsettings.json",true).Build()");
+  Application.SetWinformsSettings(configuration.GetSection("WinformsOptionalSettings").Get<WinformsOptionalSettings>())");
   ....
   return true;
 }
@@ -107,8 +107,8 @@ ApplicationConfiguartion.Initialize()
  {
    If(AppSettingsJsonExists)
     {
-      IConfiguration configuration = new ConfigurationBuilder().AddJsonFile(\\\"appsettings.json\\\", true).Build()\");
-      Application.SetWinformsSettings(configuration.GetSection(\\\"WinformsOptionalSettings\\\").Get\<WinformsOptionalSettings\>())\"); 
+      IConfiguration configuration = new ConfigurationBuilder().AddJsonFile("appsettings.json", true).Build()");
+      Application.SetWinformsSettings(configuration.GetSection("WinformsOptionalSettings").Get<WinformsOptionalSettings>())"); 
     }
     
     If(EnableVisualStyles)
