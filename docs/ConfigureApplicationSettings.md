@@ -1,10 +1,46 @@
 **Winforms Application Settings Configuration in .NET**
 
+.NET framework winforms applications use app.config to define application wide settings used by Winforms runtime, including AppContext switches to opt-in or opt out of the new features in the latest .NET framework versions released. Following are the various sections in app.config that store Winforms application settings.
+
+**Appcontext switches**
+```XML
+<configuration>
+   <runtime>
+      <AppContextSwitchOverrides value="Switch.System.Globalization.NoAsyncCurrentCulture=true" />
+   </runtime>
+</configuration>
+```
+**App settings from Settings designer/editor page**
+```XML
+ <userSettings>
+        <WinFormsApp2.Properties.Settings>
+            <setting name="Settingdfsd" serializeAs="String">
+                <value>dfds</value>
+            </setting>
+        </WinFormsApp2.Properties.Settings>
+    </userSettings>
+    <applicationSettings>
+        <WinFormsApp2.Properties.Settings>
+            <setting name="dfsd" serializeAs="String">
+                <value>sdfsdgs</value>
+            </setting>
+        </WinFormsApp2.Properties.Settings>
+    </applicationSettings>
+```
+**System.Windows.Forms.ApplicationConfigurationSection**
+```XML
+<configuration>
+  <System.Windows.Forms.ApplicationConfigurationSection>
+  ...
+  </System.Windows.Forms.ApplicationConfigurationSection>
+</configuration>
+```
+
 .NET Winforms applications currently have [limited application
 settings](https://docs.microsoft.com/en-us/dotnet/desktop/winforms/whats-new/net60?view=netdesktop-6.0#new-application-bootstrap)
-defined in the project file that were emitted into source using source
+defined at build time via project file that are emitted into source code using source
 generators at compile time. This document outlines expansion of those
-application wide settings further.
+application wide settings further and cover the scenarios that were using `System.Windows.Forms.ApplicationConfigurationSection` and  `AppContextSwitchOverrides` in .NET framework applications.
 
 **AppSettings.Json for Winforms .NET applications.**
 
@@ -15,6 +51,7 @@ settings from AppSettings.Json.
 
 **Goals:**
 
+-   Replacement for `AppContextSwitchOverrides` and `System.Windows.Forms.ApplicationConfigurationSection`
 -   Users should be able to update/modify Winforms applications settings
     without recompiling the application
 
@@ -30,7 +67,9 @@ settings from AppSettings.Json.
 
 **Out of Goal:**
 
--   Validations around the combination of Winforms settings defined in
+-  App settings from Settings designer/editor page.
+
+-    Validations around the combination of Winforms settings defined in
     AppSettings.Json.
 
 -   Dynamic/real-time load of Appsettings.
@@ -126,9 +165,9 @@ ApplicationConfiguartion.Initialize()
        Application.SetHighDpiMode(HighDpiMode.SystemAware);
      }
     
-    If(HighDpiImprovements)
+    If(EnableHidpiImprovementSwitch)
      {
-        // ...
+        AppContext.SetSwitch("EnableHighDpiImprovements", true);
      }
  }
 ```
