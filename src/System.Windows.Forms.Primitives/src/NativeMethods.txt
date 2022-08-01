@@ -8,7 +8,7 @@ BitBlt
 CloseEnhMetaFile
 CloseHandle
 CombineRgn
-CP*
+CP_ACP
 CreateActCtx
 CreateBitmap
 CreateBrushIndirect
