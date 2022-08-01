@@ -1,6 +1,8 @@
 **Winforms Application Settings Configuration in .NET**
 
-.NET framework winforms applications use app.config to define application wide settings used by Winforms applications and Winforms runtime, including AppContext switches to opt-in or opt out of the new features released in the latest .NET framework versions. Following are the various sections in app.config that you see storing Winforms application settings.
+**Application configuration in .NET framework applications**
+
+.NET framework winforms applications use app.config to define application wide settings used by Winforms applications, including AppContext switches to opt-in or opt out of the new features released in the latest .NET framework versions. Following are the various sections in the app.config that define Winforms application settings.
 
 **Appcontext switches**
 
@@ -13,9 +15,21 @@ These settings are used to opt-in or opt-out of a perticular features from Winfo
    </runtime>
 </configuration>
 ```
+**System.Windows.Forms.ApplicationConfigurationSection**
+
+This was introduced in .NET framework 4.6+ and is primarily used by Winforms runtime to enable HighDpi and accessibility improvements.
+
+```XML
+<configuration>
+  <System.Windows.Forms.ApplicationConfigurationSection>
+  ...
+  </System.Windows.Forms.ApplicationConfigurationSection>
+</configuration>
+```
+
 **App settings from Settings designer/editor page**
 
-These are settings serialized from User application into app.config file. ex: Settings designer.
+Unlike above sections, these settings are used by the user applications. These are defined by the developers developing Winforms applications and Visual Studio then serializes them into app.config file. ex: Settings designer.
 ```XML
  <userSettings>
         <WinFormsApp2.Properties.Settings>
@@ -32,82 +46,67 @@ These are settings serialized from User application into app.config file. ex: Se
         </WinFormsApp2.Properties.Settings>
     </applicationSettings>
 ```
-**System.Windows.Forms.ApplicationConfigurationSection**
 
-Thsi section is primarily used by Winforms runtime to enable HighDpi and accessibility settings and was introduced in .NET framework 4.6+.
-
-```XML
-<configuration>
-  <System.Windows.Forms.ApplicationConfigurationSection>
-  ...
-  </System.Windows.Forms.ApplicationConfigurationSection>
-</configuration>
-```
+**Application configuration in .NET (Core) applications**
 
 .NET Winforms applications currently have [limited application
-settings](https://docs.microsoft.com/en-us/dotnet/desktop/winforms/whats-new/net60?view=netdesktop-6.0#new-application-bootstrap)
+configurations](https://docs.microsoft.com/en-us/dotnet/desktop/winforms/whats-new/net60?view=netdesktop-6.0#new-application-bootstrap)
 defined at build time via project file that are emitted into source code using source
 generators at compile time. This document outlines expansion of those
-application wide settings further and cover the scenarios that were using `System.Windows.Forms.ApplicationConfigurationSection` and  `AppContextSwitchOverrides` in .NET framework applications.
+application wide settings further.
 
 **runtimeConfig.Json for Winforms .NET applications.**
 
-.NET framework applications used app.config to define application
-settings. However, in .NET we are moving away from app.config for
-performance and reliability reasons and runtimeconfig.Json to define and store Winforms application settings.
+app.config has limited support in .NET and goal is to move away from using it in .NET for
+performance and reliability reasons. In this proposal, we are leveraging runtimeconfig.json to define and store Winforms application configurations.
 
 **Goals:**
 
--   Replacement for `AppContextSwitchOverrides` and `System.Windows.Forms.ApplicationConfigurationSection`
+-   Replacement for `AppContextSwitchOverrides` and `System.Windows.Forms.ApplicationConfigurationSection` of app.config.
+
 -   Users should be able to update/modify Winforms applications settings
     without recompiling the application
 
 -   Existing applications should be able to seamlessly upgrade to this
-    new model.
-
--   Support existing applications settings from the project file.
-
+    new model when tragetting to latest .NET.
+    
 -   Unify winforms application settings (No more build time properties
     in proj file?)
-
--   Prevent performance loss due to disk read of runtimeConfig.Json.
 
 **Out of Goal:**
 
 -  App settings from Settings designer/editor page.
-
--    Validations around the combination of Winforms settings defined in
-    runtimeConfig.Json.
-
--   Dynamic/real-time load of Appsettings.
+-  Dynamic/real-time loading of configuration values from runtimeconfig.json.
+-  Non-boolean type configurations are out of scope of this proposal (?)
 
 **Syntax of Winforms application settings in runtimeConfig.Json**.
 
 ```xml
 {
-  "WinformsApplicationSettings": {
-    "ApplicationDefaultFont": "",
-    "ApplicationDpiMode": "SystemAware",
+  "WinformsRuntimeConfigurations": {
     "EnableVisualStyles": "true",
     "EnableTextRendering": "true",
-    "HighDpiImprovementSettings": {
+    "HighDpiImprovementConfigurations": {
       "HdpiImprovementsSystemAware": "true",
       "HdpiImprovementsPermonitor": "true"
     },
-    "LayoutImprovementSettings": {
+    "LayoutImprovementConfigurations": {
       "DpckingANdAcnhorImprovements": "true"
+    },
+    "AccessibilityImprovementConfigurations": {
+      "AccessibilityImprovements": "true"
     }
   }
 }
 ```
 
-**Reading Appsettings:**
+**Reading Winforms application configurations:**
 
 There are two approaches here.
 
 **At runtime:**
 
-Read applications settings always form runtimeConfig.Json at runtime and
+Read applications configurations always form runtimeconfig.json at runtime and
 populate all associated properties that are later used at various levels
 in the runtime. This approach would start throwing compile time error if
 build properties ( i.e properties in proj file etc) contains any winforms settings and project is being targeted
