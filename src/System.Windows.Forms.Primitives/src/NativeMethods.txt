@@ -45,4 +45,5 @@ LoadLibraryEx
 LOCALE_IMEASURE
 LOCALE_NAME_SYSTEM_DEFAULT
 MultiByteToWideChar
+SetSuspendState
 WideCharToMultiByte
