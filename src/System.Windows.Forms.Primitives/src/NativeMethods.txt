@@ -6,6 +6,7 @@ AdjustWindowRectExForDpi
 BeginPaint
 BitBlt
 CloseEnhMetaFile
+CloseHandle
 CombineRgn
 CP*
 CreateActCtx
@@ -27,6 +28,7 @@ GetCurrentThreadId
 GetExitCodeThread
 GetKeyboardLayout
 GetKeyboardLayoutList
+GetLocaleInfoEx
 GetModuleHandleEx
 GetProcAddress
 GetShortPathName
@@ -40,6 +42,9 @@ GlobalLock
 GlobalReAlloc
 GlobalSize
 GlobalUnlock
+LoadLibraryEx
+LOCALE_IMEASURE
+LOCALE_NAME_SYSTEM_DEFAULT
 MultiByteToWideChar
 SetSuspendState
 WideCharToMultiByte
