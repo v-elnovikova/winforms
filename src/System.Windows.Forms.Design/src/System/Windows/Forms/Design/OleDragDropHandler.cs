@@ -10,6 +10,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Design;
 using System.Windows.Forms.Design.Behavior;
+using Windows.Win32;
 using static Interop;
 using Gdi = Windows.Win32.Graphics.Gdi;
 
