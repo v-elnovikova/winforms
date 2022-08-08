@@ -5,8 +5,9 @@
 using System.Diagnostics;
 using System.Text.Json;
 
-namespace System.Windows.Forms.Primitives.RuntimeTargetFramework
+namespace System.Windows.Forms.Primitives
 {
+    // Reused from https://source.dot.net/#dotnet/RuntimeConfig.cs
     internal static partial class RuntimeTargetFramework
     {
         private static bool readConfig;
@@ -34,51 +35,49 @@ namespace System.Windows.Forms.Primitives.RuntimeTargetFramework
                 CommentHandling = JsonCommentHandling.Skip
             };
 
-            using (var stream = File.OpenRead(runtimeConfigPath))
-            using (JsonDocument doc = JsonDocument.Parse(stream, jsonDocumentOptions))
+            using FileStream stream = File.OpenRead(runtimeConfigPath);
+            using JsonDocument doc = JsonDocument.Parse(stream, jsonDocumentOptions);
+            JsonElement root = doc.RootElement;
+            if (root.TryGetProperty("runtimeOptions", out var runtimeOptionsRoot))
             {
-                JsonElement root = doc.RootElement;
-                if (root.TryGetProperty("runtimeOptions", out var runtimeOptionsRoot))
+                if (runtimeOptionsRoot.TryGetProperty("framework", out var framework))
                 {
-                    if (runtimeOptionsRoot.TryGetProperty("framework", out var framework))
+                    var runtimeConfigFramework = new TargetFramework();
+                    string? name = null;
+                    string? version = null;
+                    foreach (var property in framework.EnumerateObject())
                     {
-                        var runtimeConfigFramework = new TargetFramework();
-                        string? name = null;
-                        string? version = null;
-                        foreach (var property in framework.EnumerateObject())
+                        if (property.Name.Equals(nameof(name), StringComparison.OrdinalIgnoreCase))
                         {
-                            if (property.Name.Equals(nameof(name), StringComparison.OrdinalIgnoreCase))
-                            {
-                                name = property.Value.GetString();
-                            }
-
-                            if (property.Name.Equals(nameof(version), StringComparison.OrdinalIgnoreCase))
-                            {
-                                version = property.Value.GetString();
-                            }
+                            name = property.Value.GetString();
                         }
 
-                        if (name == null || version == null)
+                        if (property.Name.Equals(nameof(version), StringComparison.OrdinalIgnoreCase))
                         {
-                            s_framework = null;
-                        }
-                        else
-                        {
-                            s_framework = new TargetFramework
-                            {
-                                Name = name,
-                                Version = version
-                            };
+                            version = property.Value.GetString();
                         }
                     }
-                    else
+
+                    if (name == null || version == null)
                     {
                         s_framework = null;
                     }
+                    else
+                    {
+                        s_framework = new TargetFramework
+                        {
+                            Name = name,
+                            Version = version
+                        };
+                    }
                 }
-
-                readConfig = true;
+                else
+                {
+                    s_framework = null;
+                }
             }
+
+            readConfig = true;
         }
     }
 }

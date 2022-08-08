@@ -3,22 +3,28 @@
 // See the LICENSE file in the project root for more information.
 
 using System.Runtime.CompilerServices;
-using System.Windows.Forms.Primitives.RuntimeTargetFramework;
 
 namespace System.Windows.Forms.Primitives.LocalAppContextSwitches
 {
+    /// <summary>
+    /// Class reads and caches WinForm specific feature-falg values specified in the runtimeconfig.json file.
+    /// </summary>
     internal static partial class LocalAppContextSwitches
     {
-        private static int s_scaleTopLevelFormMinMaxSize;
-        public static bool ScaleTopLevelFormMinMaxSize
+        // Cache value for the diable-cache test switch setting.
+        private static bool s_disableCache => AppContext.TryGetSwitch("TestSwitch.LocalAppContext.DisableCaching", out bool disableCaching)
+            && disableCaching;
+
+        private static int s_scaleTopLevelFormMinMaxSizeWithDpi;
+        public static bool ScaleTopLevelFormMinMaxSizeWithDpi
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get => GetCachedSwitchValue("Switch.System.Windows.Forms.ScaleTopLevelFormMinMaxSize", ref s_scaleTopLevelFormMinMaxSize);
+            get => GetCachedSwitchValue("Switch.System.Windows.Forms.ScaleTopLevelFormMinMaxSizeWithDpi", ref s_scaleTopLevelFormMinMaxSizeWithDpi);
         }
 
         // Returns value of given switch using provided cache.
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal static bool GetCachedSwitchValue(string switchName, ref int cachedSwitchValue)
+        private static bool GetCachedSwitchValue(string switchName, ref int cachedSwitchValue)
         {
             // The cached switch value has 3 states: 0 - unknown, 1 - true, -1 - false
             if (cachedSwitchValue < 0)
@@ -29,17 +35,17 @@ namespace System.Windows.Forms.Primitives.LocalAppContextSwitches
             return GetCachedSwitchValueInternal(switchName, ref cachedSwitchValue);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static bool GetCachedSwitchValueInternal(string switchName, ref int cachedSwitchValue)
         {
             bool hasSwitch = AppContext.TryGetSwitch(switchName, out bool isSwitchEnabled);
             if (!hasSwitch)
             {
-                isSwitchEnabled = GetSwitchDefaultValue(switchName);
+                var switchDefaultValue = (bool?)GetSwitchDefaultValue(switchName);
+                isSwitchEnabled = switchDefaultValue ?? false;
             }
 
-            // Is caching switches disabled?.
-            AppContext.TryGetSwitch("TestSwitch.LocalAppContext.DisableCaching", out bool disableCaching);
-            if (!disableCaching)
+            if (!s_disableCache)
             {
                 cachedSwitchValue = isSwitchEnabled ? 1 /*true*/ : -1 /*false*/;
             }
@@ -48,21 +54,23 @@ namespace System.Windows.Forms.Primitives.LocalAppContextSwitches
         }
 
         // Provides default values for switches if they're not always false by default
-        private static bool GetSwitchDefaultValue(string switchName)
+        private static object? GetSwitchDefaultValue(string switchName)
         {
-            if (OsVersion.IsWindows10_1703OrGreater)
+            if (!OsVersion.IsWindows10_1703OrGreater)
             {
-                var tfm = RuntimeTargetFramework.Framework;
-                if (tfm is not null && tfm.Name == "Microsoft.NETCore.App" && string.Compare(tfm.Version,"8.0", StringComparison.OrdinalIgnoreCase) >=0)
+                return default;
+            }
+
+            var tfm = RuntimeTargetFramework.Framework;
+            if (tfm is not null && tfm.Name == "Microsoft.NETCore.App" && string.Compare(tfm.Version, "8.0", StringComparison.OrdinalIgnoreCase) >= 0)
+            {
+                if (switchName == "Switch.System.Windows.Forms.ScaleTopLevelFormMinMaxSizeWithDpi")
                 {
-                    if (switchName == "Switch.System.Windows.Forms.ScaleTopLevelFormMinMaxSize")
-                    {
-                        return true;
-                    }
+                    return true;
                 }
             }
 
-            return false;
+            return default;
         }
     }
 }
