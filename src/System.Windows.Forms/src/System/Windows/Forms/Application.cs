@@ -1,4 +1,4 @@
-﻿// Licensed to the .NET Foundation under one or more agreements.
+// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
@@ -81,7 +81,7 @@ namespace System.Windows.Forms
         ///  Returns True if it is OK to continue idle processing. Typically called in an Application.Idle event handler.
         /// </summary>
         internal static bool CanContinueIdle
-            => ThreadContext.FromCurrent().ComponentManager.FContinueIdle().IsTrue();
+            => ThreadContext.FromCurrent().ComponentManager.FContinueIdle();
 
         /// <summary>
         ///  Typically, you shouldn't need to use this directly - use RenderWithVisualStyles instead.
@@ -121,9 +121,9 @@ namespace System.Windows.Forms
             byte[] test = Encoding.ASCII.GetBytes(IpProcName);
             fixed (byte* ptr = &test[0])
             {
-                if (hModule != 0)
+                if (!hModule.IsNull)
                 {
-                    return PInvoke.GetProcAddress(hModule,(Foundation.PCSTR)ptr) != 0;
+                    return PInvoke.GetProcAddress(hModule, (PCSTR)ptr) != 0;
                 }
             }
 
@@ -136,7 +136,7 @@ namespace System.Windows.Forms
 
             fixed (byte* ptr = &test[0])
             {
-                return PInvoke.GetProcAddress(hModule, (Foundation.PCSTR)ptr) != 0;
+                return PInvoke.GetProcAddress(hModule, (PCSTR)ptr) != 0;
             }
         }
 
@@ -603,7 +603,7 @@ namespace System.Windows.Forms
         {
             uint thisPID = PInvoke.GetCurrentProcessId();
             uint processId;
-            Foundation.HWND hwnd = (Foundation.HWND)handle;
+            HWND hwnd = (HWND)handle;
             PInvoke.GetWindowThreadProcessId(hwnd, &processId);
             if (processId == thisPID && PInvoke.IsWindowVisible(hwnd))
             {
@@ -613,7 +613,7 @@ namespace System.Windows.Forms
                     flags: User32.RDW.INVALIDATE | User32.RDW.FRAME | User32.RDW.ERASE | User32.RDW.ALLCHILDREN);
             }
 
-            return BOOL.TRUE;
+            return true;
         }
 
         /// <summary>
@@ -629,7 +629,7 @@ namespace System.Windows.Forms
             // Then do myself.
             User32.SendMessageW(handle, User32.WM.THEMECHANGED);
 
-            return BOOL.TRUE;
+            return true;
         }
 
         /// <summary>
@@ -681,12 +681,12 @@ namespace System.Windows.Forms
         public static bool FilterMessage(ref Message message)
         {
             // Create copy of MSG structure
-            User32.MSG msg = message;
+            MSG msg = message;
             bool processed = ThreadContext.FromCurrent().ProcessFilters(ref msg, out bool modified);
             if (modified)
             {
                 message.HWnd = msg.hwnd;
-                message.MsgInternal = msg.message;
+                message.MsgInternal = (User32.WM)msg.message;
                 message.WParamInternal = msg.wParam;
                 message.LParamInternal = msg.lParam;
             }
@@ -1005,7 +1005,7 @@ namespace System.Windows.Forms
         /// <summary>
         ///  Locates a thread context given a window handle.
         /// </summary>
-        internal static unsafe ThreadContext GetContextForHandle<T>(T handle) where T : IHandle<Foundation.HWND>
+        internal static unsafe ThreadContext GetContextForHandle<T>(T handle) where T : IHandle<HWND>
         {
             ThreadContext threadContext = ThreadContext.FromId(PInvoke.GetWindowThreadProcessId(handle.Handle, null));
             Debug.Assert(
@@ -1068,7 +1068,7 @@ namespace System.Windows.Forms
         /// <summary>
         ///  "Parks" the given HWND to a temporary HWND. This allows WS_CHILD windows to be parked.
         /// </summary>
-        internal static void ParkHandle(HandleRef<Foundation.HWND> handle, IntPtr dpiAwarenessContext)
+        internal static void ParkHandle(HandleRef<HWND> handle, IntPtr dpiAwarenessContext)
         {
             Debug.Assert(PInvoke.IsWindow(handle), "Handle being parked is not a valid window handle");
             Debug.Assert(
@@ -1110,7 +1110,7 @@ namespace System.Windows.Forms
         ///  "Unparks" the given HWND to a temporary HWND.  This allows WS_CHILD windows to
         ///  be parked.
         /// </summary>
-        internal static void UnparkHandle(IHandle<Foundation.HWND> handle, IntPtr context)
+        internal static void UnparkHandle(IHandle<HWND> handle, IntPtr context)
         {
             ThreadContext threadContext = GetContextForHandle(handle);
             if (threadContext is not null)
