@@ -13,7 +13,6 @@ using System.Drawing.Design;
 using System.Globalization;
 using System.Runtime.InteropServices;
 using System.Windows.Forms.Layout;
-using Windows.Win32.UI.Shell;
 using static System.Windows.Forms.ComboBox.ObjectCollection;
 using static Interop;
 using static Interop.User32;
@@ -3308,7 +3307,7 @@ namespace System.Windows.Forms
                             if (_stringSource is null)
                             {
                                 _stringSource = new StringSource(GetStringsForAutoComplete(AutoCompleteCustomSource));
-                                if (!_stringSource.Bind(new HandleRef(this, _childEdit.Handle), (AUTOCOMPLETEOPTIONS)AutoCompleteMode))
+                                if (!_stringSource.Bind(new HandleRef(this, _childEdit.Handle), (Shell32.AUTOCOMPLETEOPTIONS)AutoCompleteMode))
                                 {
                                     throw new ArgumentException(SR.AutoCompleteFailure);
                                 }
@@ -3335,7 +3334,7 @@ namespace System.Windows.Forms
                                 if (_stringSource is null)
                                 {
                                     _stringSource = new StringSource(GetStringsForAutoComplete(Items));
-                                    if (!_stringSource.Bind(new HandleRef(this, _childEdit.Handle), (AUTOCOMPLETEOPTIONS)AutoCompleteMode))
+                                    if (!_stringSource.Bind(new HandleRef(this, _childEdit.Handle), (Shell32.AUTOCOMPLETEOPTIONS)AutoCompleteMode))
                                     {
                                         throw new ArgumentException(SR.AutoCompleteFailureListItems);
                                     }

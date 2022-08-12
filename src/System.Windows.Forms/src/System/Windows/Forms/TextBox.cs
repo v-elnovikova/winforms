@@ -8,7 +8,6 @@ using System.Drawing;
 using System.Drawing.Design;
 using System.Runtime.InteropServices;
 using System.Windows.Forms.VisualStyles;
-using Windows.Win32.UI.Shell;
 using static Interop;
 using static Interop.User32;
 
@@ -781,7 +780,7 @@ namespace System.Windows.Forms
                             if (_stringSource is null)
                             {
                                 _stringSource = new StringSource(GetStringsForAutoComplete());
-                                if (!_stringSource.Bind(new HandleRef(this, Handle), (AUTOCOMPLETEOPTIONS)AutoCompleteMode))
+                                if (!_stringSource.Bind(new HandleRef(this, Handle), (Shell32.AUTOCOMPLETEOPTIONS)AutoCompleteMode))
                                 {
                                     throw new ArgumentException(SR.AutoCompleteFailure);
                                 }
