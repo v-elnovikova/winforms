@@ -143,7 +143,7 @@ namespace System.Windows.Forms
                     // we should return an UI Automation provider using the UiaReturnRawElementProvider function.
                     m.ResultInternal = (LRESULT)UiaCore.UiaReturnRawElementProvider(
                         this,
-                        m.WParamInternal,
+                        (nint)m.WParamInternal,
                         m.LParamInternal,
                         accessibilityObject);
 
@@ -156,7 +156,10 @@ namespace System.Windows.Forms
 
                     try
                     {
-                        m.ResultInternal = (LRESULT)Oleacc.LresultFromObject(in IID.IAccessible, m.WParamInternal, new HandleRef(this, pUnknown));
+                        m.ResultInternal = (LRESULT)Oleacc.LresultFromObject(
+                            in IID.IAccessible,
+                            (nint)m.WParamInternal,
+                            new HandleRef(this, pUnknown));
                     }
                     finally
                     {
