@@ -32,7 +32,7 @@
     <MicrosoftNETCoreAppRuntimewinx64PackageVersion>7.0.0-rc.2.22456.11</MicrosoftNETCoreAppRuntimewinx64PackageVersion>
     <MicrosoftNETCorePlatformsPackageVersion>7.0.0-rc.2.22456.11</MicrosoftNETCorePlatformsPackageVersion>
     <MicrosoftWin32SystemEventsPackageVersion>7.0.0-rc.2.22456.11</MicrosoftWin32SystemEventsPackageVersion>
-    <MicrosoftWindowsCsWin32PackageVersion>0.2.28-beta</MicrosoftWindowsCsWin32PackageVersion>
+    <MicrosoftWindowsCsWin32PackageVersion>0.2.37-beta</MicrosoftWindowsCsWin32PackageVersion>
     <SystemCodeDomPackageVersion>7.0.0-rc.2.22456.11</SystemCodeDomPackageVersion>
     <SystemConfigurationConfigurationManagerPackageVersion>7.0.0-rc.2.22456.11</SystemConfigurationConfigurationManagerPackageVersion>
     <SystemDrawingCommonPackageVersion>7.0.0-rc.2.22456.11</SystemDrawingCommonPackageVersion>
