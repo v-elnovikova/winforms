@@ -3238,7 +3238,7 @@ namespace System.Windows.Forms
                     }
                 }
 
-                Shell32.DragAcceptFiles(this, false);
+                PInvoke.DragAcceptFiles(this, fAccept: false);
             }
         }
 
