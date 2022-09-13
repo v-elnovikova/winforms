@@ -16,6 +16,7 @@ using System.Runtime.InteropServices.ComTypes;
 using System.Text;
 using System.Windows.Forms.Automation;
 using System.Windows.Forms.Layout;
+using System.Windows.Forms.Primitives;
 using Microsoft.Win32;
 using static Interop;
 using Encoding = System.Text.Encoding;
@@ -916,7 +917,7 @@ namespace System.Windows.Forms
                 {
                     return Properties.GetObject(s_dataContextProperty);
                 }
-                
+
                 return ParentInternal?.DataContext;
             }
             set
@@ -925,7 +926,7 @@ namespace System.Windows.Forms
                 {
                     return;
                 }
-                
+
                 // When DataContext was different than its parent before, but now it is about to become the same,
                 // we're removing it altogether, so it can inherit the value from its parent.
                 if (Properties.ContainsObject(s_dataContextProperty) && Equals(ParentInternal?.DataContext, value))
@@ -4744,7 +4745,10 @@ namespace System.Windows.Forms
             SetState(States.CheckedHost, false);
             if (ParentInternal is not null)
             {
-                ParentInternal.LayoutEngine.InitLayout(this, BoundsSpecified.All);
+                if (!LocalAppContextSwitches.OptImprovedAnchorLayout || !ParentInternal.IsLayoutSuspended)
+                {
+                    ParentInternal.LayoutEngine.InitLayout(this, BoundsSpecified.All);
+                }
             }
         }
 
@@ -10287,6 +10291,11 @@ namespace System.Windows.Forms
             but we break things at every step.
 
             */
+            if (LocalAppContextSwitches.OptImprovedAnchorLayout1 && IsLayoutSuspended)
+            {
+                return;
+            }
+
             if (!performLayout)
             {
                 CommonProperties.xClearPreferredSizeCache(this);
@@ -10299,8 +10308,9 @@ namespace System.Windows.Forms
                 {
                     for (int i = 0; i < controlsCollection.Count; i++)
                     {
-                        LayoutEngine.InitLayout(controlsCollection[i], BoundsSpecified.All);
-                        CommonProperties.xClearPreferredSizeCache(controlsCollection[i]);
+                        Control control = controlsCollection[i];
+                        LayoutEngine.InitLayout(control, BoundsSpecified.All);
+                        CommonProperties.xClearPreferredSizeCache(control);
                     }
                 }
             }
