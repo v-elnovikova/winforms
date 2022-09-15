@@ -8718,6 +8718,14 @@ namespace System.Windows.Forms
                 Invalidate();
             }
 
+            if (LocalAppContextSwitches.OptImprovedAnchorLayout2 && Parent is null && TopLevelControl != this)
+            {
+                foreach (Control child in Controls)
+                {
+                    LayoutEngine.InitLayout(child, BoundsSpecified.Size);
+                }
+            }
+
             LayoutTransaction.DoLayout(this, this, PropertyNames.Bounds);
             ((EventHandler?)Events[s_resizeEvent])?.Invoke(this, e);
         }

@@ -1787,6 +1787,7 @@ namespace System.Windows.Forms
                 }
 
                 SplitterWidth = (int)Math.Round((float)SplitterWidth * scale);
+                SplitterDistance = (int)Math.Round((float)SplitterDistance * scale);
             }
             finally
             {
