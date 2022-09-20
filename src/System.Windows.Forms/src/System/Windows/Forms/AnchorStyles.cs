@@ -39,4 +39,20 @@ namespace System.Windows.Forms
         /// </summary>
         None = 0,
     }
+
+    public sealed class ControlAnchors
+    {
+        public ControlAnchors(int? left, int? top, int? right, int? bottom)
+        {
+            Left = left;
+            Top = top;
+            Right = right;
+            Bottom = bottom;
+        }
+
+        public int? Left;
+        public int? Top;
+        public int? Right;
+        public int? Bottom;
+    }
 }

@@ -1,0 +1,6 @@
+System.Windows.Forms.ControlAnchors
+System.Windows.Forms.ControlAnchors.Bottom -> int?
+System.Windows.Forms.ControlAnchors.ControlAnchors(int? left, int? top, int? right, int? bottom) -> void
+System.Windows.Forms.ControlAnchors.Left -> int?
+System.Windows.Forms.ControlAnchors.Right -> int?
+System.Windows.Forms.ControlAnchors.Top -> int?

@@ -342,6 +342,7 @@ namespace System.Windows.Forms
 
         // Contains a collection of calculated fonts for various Dpi values of the control in the PerMonV2 mode.
         private Dictionary<int, Font>? _dpiFonts;
+        private ControlAnchors? _anchors;
 
 #if DEBUG
         internal int LayoutSuspendCount
@@ -762,6 +763,20 @@ namespace System.Windows.Forms
         {
             get => DefaultLayout.GetAnchor(this);
             set => DefaultLayout.SetAnchor(this, value);
+        }
+
+        [Localizable(true)]
+        [SRDescription(nameof(SR.ControlAnchorDescr))]
+        [RefreshProperties(RefreshProperties.Repaint)]
+        public virtual ControlAnchors? Anchors
+        {
+            get => _anchors;
+            set => SetAnchors(value);
+        }
+
+        private void SetAnchors(ControlAnchors? value)
+        {
+            _anchors = value;
         }
 
         [SRCategory(nameof(SR.CatLayout))]
